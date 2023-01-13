@@ -1,0 +1,719 @@
+openapi: 3.0.0
+info:
+  title: SMAT API Documentation
+  description: >-
+    API documentation for SMAT crypto backend
+  version: 3.0.0
+servers:
+  - url: "https://api.example.com/"
+  - url: "http://localhost:8080/"
+
+security:
+  - basicAuth: []
+tags: 
+  - name: Wealth Manager
+  - name: Transaction
+  - name: Token
+
+paths:
+  /crypto/wealth_manager/create_address:
+    post:
+      tags:
+        - Wealth Manager
+      operationId: wealthManagerFinInfo
+      summary: Adds a new wallet for wealth manager's client
+      requestBody:
+        description: Sends a request to add a new wallet for the Wealth Manager
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WalletRequest"
+
+      responses:
+        "200":
+          description: Return if successful
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: "#/components/schemas/WalletID"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /crypto/wealth_managers/aum:
+    get:
+      tags:
+        - Wealth Manager
+      operationId: wealthManagerAUM
+      summary: Get the equivalent assets under management for wealth managers over a period of time
+
+      parameters:
+         - name: wealth_manager_id
+           in: query
+           description: Wealth Managers unique id 
+           required: true
+           explode: true
+           schema:
+            type: array
+            items:
+              type: string
+
+      responses:
+        "200":
+          description: Return if successful
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/WealthManagerAUM"
+                
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
+        
+  /crypto/wealth_managers/aggregated_assets:
+    get:
+      tags:
+        - Wealth Manager
+      operationId: wealthManagerAggAssets
+      summary: Get the aggregated assets of wealth managers
+
+      parameters:
+         - name: wealth_manager_id
+           in: query
+           description: Wealth Managers unique id 
+           required: true
+           explode: true
+           schema:
+            type: array
+            items:
+              type: string
+
+      responses:
+        "200":
+          description: Return if successful
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/WealthManagerAgg"
+                
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
+        
+
+
+  /crypto/transactions/status:
+    put:
+      tags:
+        - Transaction
+      operationId: generalInfo
+      summary: Updates transaction status; ongoing or completed
+      
+      requestBody:
+        description: Requests the update of a transaction's status.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransactionStatus"
+
+      responses:
+        "200":
+          description: Return if successful
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: "#/components/schemas/Success"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
+        
+  /crypto/transactions/hex:
+    put:
+      tags:
+        - Transaction
+      operationId: TransactionHex
+      summary: Retrieves and updates transaction hex;
+      
+      requestBody:
+        description: Requests the transaction hex.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransactionHex"
+
+      responses:
+        "200":
+          description: Return if successful
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: "#/components/schemas/Success"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /crypto/transactions/types:
+    get:
+      tags:
+        - Transaction
+      operationId: generalInfo
+      summary: Returns an array of a given transactions per type
+      parameters:
+         - name: wealth_manager_id
+           in: query
+           description: Wealth Managers who triggered transaction
+           required: true
+           explode: true
+           schema:
+            type: array
+            items:
+              type: string
+
+         - name: client_id
+           in: query
+           description: Client whose funds were used for the transaction
+           required: true
+           explode: true
+           schema:
+            type: array
+            items:
+              type: string
+
+         - name: transaction_type
+           in: query
+           description: Type of transaction triggered ie on ramp, off tamp, swaps, etc.
+           required: true
+           explode: true
+           schema:
+            type: array
+            items:
+              type: string
+     
+      responses:
+        "200":
+          description: Return specific detials on the transaction type
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionType"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /crypto/transactions/onramp:
+    post:
+      tags:
+        - Transaction
+      operationId: generalInfo
+      summary: Adds a new on ramp transaction
+      requestBody:
+        description: Sends a request to add a new on ramp transaction
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransactionOnramp"
+
+      responses:
+        "200":
+          description: Return if successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionID"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
+        
+
+  /crypto/transactions/offramp:
+    post:
+      tags:
+        - Transaction
+      operationId: generalInfo
+      summary: Adds a new off ramp transaction
+      requestBody:
+        description: Requests transactions of a wealth manager by ID
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransactionOfframp"
+
+      responses:
+        "200":
+          description: Return if successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionID"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /crypto/transactions/swap:
+    post:
+      tags:
+        - Transaction
+      operationId: generalInfo
+      summary: Adds a new swap transaction
+      requestBody:
+        description: Requests transactions of a wealth manager by ID
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransactionSwap"
+
+      responses:
+        "200":
+          description: Return if successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionID"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
+        
+  /crypto/transactions/staking:
+    post:
+      tags:
+        - Transaction
+      operationId: generalInfo
+      summary: Adds a new staking transaction
+      requestBody:
+        description: Requests transactions of a wealth manager by ID
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransactionStaking"
+
+      responses:
+        "200":
+          description: Return if successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionID"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  #   /transaction/{id}:
+  /crypto/tokens/price:
+    get:
+      tags:
+        - Token
+      operationId: TokenPrice
+      summary: Endpoint return all the live prices on cryptocurrency
+      parameters:
+         - name: token_id
+           in: query
+           description: Unique identifier of a given token.
+           required: true
+           explode: true
+           schema:
+            type: array
+            items:
+              type: integer
+
+      responses:
+        "200":
+          description: Return if successful
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: "#/components/schemas/TokenPriceRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /crypto/token/details:
+    get:
+      tags:
+        - Token
+      operationId: TokenDescription
+      summary: Endpoint return non-price related data on cryptocurrency
+
+      parameters:
+         - name: token_id
+           in: query
+           description: Unique identifier of a given token.
+           required: true
+           explode: true
+           schema:
+            type: array
+            items:
+              type: integer
+
+      responses:
+        "200":
+          description: Return if successful
+          content:
+            application/json:
+              schema:
+                type: Object
+                $ref: "#/components/schemas/TokenDescription"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+### ///
+### ///
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    NotFound:
+      description: The specified resource was not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    ServerError:
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+  schemas:
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+        status:
+          type: integer
+
+    Success:
+      type: object
+      properties:
+        message:
+          type: string
+        status:
+          type: integer
+
+# ////
+    WealthManagerAUM:
+      type: object
+      description: AUMs will be ordered by {year,month} with the oldest first and will return data for 24 months if available.***
+      properties:
+        wealth_manager_currency:
+          type: string
+          format: string
+          example: USD
+        wealth_manager_aums:
+          type: object
+          properties:
+            year:
+              type: integer
+              format: integer
+              example: 2019
+            wealth_manager_aum:
+              type: number
+              format: float
+              example: 5054680.98
+            month:
+              type: integer
+              format: integer
+              example: 1
+              minimum: 6
+              maximum: 12
+
+    WealthManagerAgg:
+      type: object
+      properties:
+        token_id:
+          type: integer
+          format: uuid
+          example: 173
+        token_amount:
+          type: integer
+          format: float
+          example: 500.45
+    
+  # /// 
+    WalletRequest:
+      type: object
+      properties:
+        walletAddress:
+          type: string
+          format: string
+        client_id:
+          type: string
+          format: string
+        Token:
+          type: string
+          format: string
+        TokenChain:
+          type: string
+          format: email
+        TokenCode:
+          type: string
+          format: string
+    
+    WalletID:
+      type: object
+      properties:
+        walletAddress:
+          type: string
+          format: string
+          example: 0xb794f5ea0ba39494ce839613fffba74279579268 
+
+    TransactionType:
+      type: object
+      properties:
+        transaction_id:
+          type: integer
+          format: uid
+        client_approval:
+          type: string
+          format: string
+        wealth_manager_approval:
+          type: string
+          format: string
+        transaction_amount:
+          type: integer
+          format: integer
+        transaction_time:
+          type: string
+          format: string
+        transaction_status:
+          type: string
+          format: string
+
+    TransactionStatus:
+      type: object
+      properties:
+        transaction_id:
+          type: integer
+          format: uuid
+          example: 423943
+        transaction_status:
+          type: string
+          format: string
+          example: Ongoing Transaction
+
+    TransactionHex:
+      type: object
+      properties:
+        transaction_id:
+          type: integer
+          format: uuid
+          example: 423943
+        transaction_hex:
+          type: string
+          format: string
+          example: 0x316b99df8e8ce1f94191b5f670ce93b99745a9b933082b9b4f406e28a9377275
+
+    TransactionID:
+      type: object
+      properties:
+        transaction_id:
+          type: integer
+          format: uuid
+          example: 23943 
+
+    TransactionOnramp:
+      type: object
+      required:
+        - token_id
+        - fiat_amount
+        - fiat_currency
+      properties:
+        client_id:
+          type: integer
+          format: uid
+          example: 304
+        wealth_manager_id:
+          type: integer
+          format: uid
+          example: 18
+        fiat_amount:
+          type: integer
+          format: integer
+          example: 3848430
+        fiat_currency:
+          type: string
+          format: string
+          example: USD
+        token_id:
+          type: integer
+          format: integer
+          example: 47
+
+    TransactionOfframp:
+      type: object
+      required:
+        - token_id
+        - fiat_currency
+      properties:
+        client_id:
+          type: integer
+          format: uid
+        wealth_manager_id:
+          type: integer
+          format: uid
+        bank_id:
+          type: integer
+          format: uid
+        # fiat_amount:
+        #   type: integer
+        #   format: integer
+        fiat_currency:
+          type: string
+          format: string
+        token_id:
+          type: integer
+          format: integer
+        
+
+    TransactionSwap:
+      type: object
+      required:
+        - token_sell_id
+        - token_buy_id
+      properties:
+        wealth_manager_id:
+          type: integer
+          format: uid
+        client_id:
+          type: integer
+          format: uid
+        token_sell_id:
+          type: integer
+          format: integer
+        token_buy_id:
+          type: integer
+          format: integer
+
+    TransactionStaking:
+      type: object
+      required:
+        - token_staked_id
+        - token_buy_id
+      properties:
+        transaction_id:
+          type: integer
+          format: uid
+        wealth_manager_id:
+          type: integer
+          format: uid
+        client_id:
+          type: integer
+          format: uid
+        token_staked_id:
+          type: string
+          format: string
+        token_amount:
+          type: integer
+          format: integer
+        token_lock_period:
+          type: integer
+          format: integer
+        staking_type:
+          type: string
+          format: string
+        transaction_type:
+          type: string
+          format: string
+        transaction_hex:
+          type: string
+          format: string
+
+    TokenDescription:
+      type: object  
+      properties:
+        Token:
+          type: string
+          format: string
+        TokenCode:
+          type: string
+          format: string
+        TokenLogo:
+          type: integer
+          format: integer
+
+    TokenPriceRequest:
+      type: object
+      properties:
+        Token:
+          type: string
+          format: string
+          example: Solana
+        TokenPrice:
+          type: number
+          format: float
+          example: 60.54
+        TokenPriceCurrency:
+          type: string
+          format: string
+          example: USD
+        TokenPriceChange:
+          type: number
+          format: float
+          example: 5.45
+        
